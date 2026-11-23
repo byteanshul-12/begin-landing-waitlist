@@ -20,12 +20,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, phone, city, profile, linkedin } = req.body || {};
+    const { name, email, city, profile, phone, linkedin } = req.body || {};
 
-    // Validate presence of all required fields
-    if (!name || !email || !phone || !city || !profile) {
+    // Validate presence of required fields
+    if (!name || !email || !city || !profile) {
       return res.status(400).json({
-        error: 'Missing required fields. Please provide name, email, phone, city, and profile.'
+        error: 'Missing required fields. Please provide name, email, city, and profile.'
       });
     }
 
@@ -40,9 +40,9 @@ export default async function handler(req, res) {
     const submission = {
       name: String(name).trim(),
       email: emailClean,
-      phone: String(phone).trim(),
       city: String(city).trim(),
       profile: String(profile).trim(),
+      ...(phone ? { phone: String(phone).trim() } : {}),
       ...(linkedin ? { linkedin: String(linkedin).trim() } : {})
     };
 
@@ -72,14 +72,35 @@ export default async function handler(req, res) {
         let errorText = await response.text();
         console.error('Supabase error:', errorText);
 
+        // If the table schema has a NOT NULL constraint on 'phone', retry with empty string
+        if (!submission.phone && errorText.includes('phone') && (errorText.includes('not-null') || errorText.includes('null value') || response.status === 400)) {
+          const phoneFallback = {
+            ...submission,
+            phone: ''
+          };
+          response = await fetch(`${cleanUrl}/rest/v1/waitlist`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(phoneFallback)
+          });
+          if (!response.ok) {
+            errorText = await response.text();
+          }
+        }
+
         // If the 'linkedin' column is not yet present in Supabase table schema, retry without it
         if (submission.linkedin && (errorText.includes('linkedin') || (response.status === 400 && errorText.includes('column')))) {
           const fallback = {
             name: submission.name,
             email: submission.email,
-            phone: submission.phone,
             city: submission.city,
-            profile: submission.profile
+            profile: submission.profile,
+            ...(submission.phone !== undefined ? { phone: submission.phone } : {})
           };
           response = await fetch(`${cleanUrl}/rest/v1/waitlist`, {
             method: 'POST',

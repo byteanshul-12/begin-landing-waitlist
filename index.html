@@ -389,36 +389,7 @@
             </div>
           </div>
 
-          <!-- Question 3: Mobile No -->
-          <div class="flex flex-col gap-1.5">
-            <label for="form-phone" class="font-label text-xs sm:text-[13px] font-medium text-on-surface">
-              Mobile no <span class="text-accent-lime">*</span>
-            </label>
-            <input type="tel"
-                   id="form-phone"
-                   name="phone"
-                   required
-                   autocomplete="tel"
-                   placeholder="+1 (555) 000-0000 or 10-digit number"
-                   class="w-full rounded-xl bg-surface-card border border-outline px-3.5 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:border-accent-lime focus:ring-1 focus:ring-accent-lime focus:outline-none transition-colors">
-            <p id="form-phone-error" class="hidden text-[11px] font-mono text-red-500 mt-0.5"></p>
-          </div>
-
-          <!-- Question 4: LinkedIn Profile -->
-          <div class="flex flex-col gap-1.5">
-            <label for="form-linkedin" class="font-label text-xs sm:text-[13px] font-medium text-on-surface">
-              LinkedIn profile <span class="text-accent-lime">*</span>
-            </label>
-            <input type="text"
-                   id="form-linkedin"
-                   name="linkedin"
-                   required
-                   placeholder="e.g. linkedin.com/in/yourprofile"
-                   class="w-full rounded-xl bg-surface-card border border-outline px-3.5 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:border-accent-lime focus:ring-1 focus:ring-accent-lime focus:outline-none transition-colors">
-            <p id="form-linkedin-error" class="hidden text-[11px] font-mono text-red-500 mt-0.5"></p>
-          </div>
-
-          <!-- Question 5: City -->
+          <!-- Question 3: City -->
           <div class="flex flex-col gap-1.5">
             <label for="form-city" class="font-label text-xs sm:text-[13px] font-medium text-on-surface">
               Which city are you based in? <span class="text-accent-lime">*</span>
@@ -432,7 +403,7 @@
             <p id="form-city-error" class="hidden text-[11px] font-mono text-red-500 mt-0.5"></p>
           </div>
 
-          <!-- Question 6: What describes you the best? (Select one) -->
+          <!-- Question 4: What describes you the best? (Select one) -->
           <fieldset class="flex flex-col gap-2 pt-1 border-0 p-0 m-0">
             <legend class="font-label text-xs sm:text-[13px] font-medium text-on-surface mb-1">
               What describes you the best? <span class="text-accent-lime">*</span>
@@ -551,8 +522,6 @@
         // Form Fields
         var nameInput = document.getElementById('form-name');
         var emailInput = document.getElementById('form-email');
-        var phoneInput = document.getElementById('form-phone');
-        var linkedinInput = document.getElementById('form-linkedin');
         var cityInput = document.getElementById('form-city');
         var radioCards = document.querySelectorAll('.choice-card');
         var submitBtn = document.getElementById('modal-submit-btn');
@@ -568,8 +537,6 @@
         var emailSuggestion = document.getElementById('form-email-suggestion');
         var emailSuggestedDomain = document.getElementById('form-email-suggested-domain');
         var emailSuggestionBtn = document.getElementById('form-email-suggestion-btn');
-        var phoneError = document.getElementById('form-phone-error');
-        var linkedinError = document.getElementById('form-linkedin-error');
         var cityError = document.getElementById('form-city-error');
         var profileError = document.getElementById('form-profile-error');
         var generalError = document.getElementById('form-general-error');
@@ -765,18 +732,6 @@
             nameInput.classList.remove('border-red-500');
           });
         }
-        if (phoneInput) {
-          phoneInput.addEventListener('input', function () {
-            if (phoneError) phoneError.classList.add('hidden');
-            phoneInput.classList.remove('border-red-500');
-          });
-        }
-        if (linkedinInput) {
-          linkedinInput.addEventListener('input', function () {
-            if (linkedinError) linkedinError.classList.add('hidden');
-            linkedinInput.classList.remove('border-red-500');
-          });
-        }
         if (cityInput) {
           cityInput.addEventListener('input', function () {
             if (cityError) cityError.classList.add('hidden');
@@ -792,8 +747,6 @@
 
             var nameVal = (nameInput ? nameInput.value.trim() : '');
             var emailVal = (emailInput ? emailInput.value.trim() : '');
-            var phoneVal = (phoneInput ? phoneInput.value.trim() : '');
-            var linkedinVal = (linkedinInput ? linkedinInput.value.trim() : '');
             var cityVal = (cityInput ? cityInput.value.trim() : '');
             var selectedRadio = form.querySelector('input[name="profile"]:checked');
             var profileVal = selectedRadio ? selectedRadio.value : '';
@@ -818,30 +771,6 @@
               if (emailErrorText) emailErrorText.textContent = emailCheck.reason;
               if (emailInput) emailInput.classList.add('border-red-500');
               if (!hasError && emailInput) emailInput.focus();
-              hasError = true;
-            }
-
-            // Validate Phone (allow digits, +, -, space, brackets, min 8 digits)
-            var cleanPhone = phoneVal.replace(/[^0-9+]/g, '');
-            var digitCount = (cleanPhone.match(/\d/g) || []).length;
-            if (!cleanPhone || digitCount < 8 || digitCount > 15) {
-              if (phoneError) {
-                phoneError.textContent = 'Please enter a valid mobile number (min. 10 digits).';
-                phoneError.classList.remove('hidden');
-              }
-              if (phoneInput) phoneInput.classList.add('border-red-500');
-              if (!hasError && phoneInput) phoneInput.focus();
-              hasError = true;
-            }
-
-            // Validate LinkedIn Profile
-            if (!linkedinVal || linkedinVal.length < 3) {
-              if (linkedinError) {
-                linkedinError.textContent = 'Please enter your LinkedIn profile link.';
-                linkedinError.classList.remove('hidden');
-              }
-              if (linkedinInput) linkedinInput.classList.add('border-red-500');
-              if (!hasError && linkedinInput) linkedinInput.focus();
               hasError = true;
             }
 
@@ -872,16 +801,9 @@
             if (submitText) submitText.textContent = 'Reserving your spot...';
             if (submitSpinner) submitSpinner.classList.remove('hidden');
 
-            var cleanLinkedin = linkedinVal;
-            if (cleanLinkedin && !/^https?:\/\//i.test(cleanLinkedin) && /^(www\.)?linkedin\.com/i.test(cleanLinkedin)) {
-              cleanLinkedin = 'https://' + cleanLinkedin;
-            }
-
             var payload = {
               name: nameVal,
               email: emailVal.toLowerCase(),
-              phone: phoneVal,
-              linkedin: cleanLinkedin,
               city: cityVal,
               profile: profileVal,
               submittedAt: new Date().toISOString()
@@ -911,8 +833,6 @@
               var insertData = {
                 name: payload.name,
                 email: payload.email,
-                phone: payload.phone,
-                linkedin: payload.linkedin,
                 city: payload.city,
                 profile: payload.profile
               };
@@ -936,14 +856,14 @@
               }
               var sbErrText = await sbResp.text();
 
-              // If column 'linkedin' is not yet created in user's Supabase table, retry without it
-              if (sbErrText.includes('linkedin') || (sbResp.status === 400 && sbErrText.includes('column'))) {
+              // If existing database schema still has a NOT NULL constraint on 'phone', retry with empty string
+              if (sbErrText.includes('phone') && (sbErrText.includes('not-null') || sbErrText.includes('null value') || sbResp.status === 400)) {
                 var fallbackData = {
                   name: payload.name,
                   email: payload.email,
-                  phone: payload.phone,
                   city: payload.city,
-                  profile: payload.profile
+                  profile: payload.profile,
+                  phone: ''
                 };
                 var retryResp = await postToTable(fallbackData);
                 if (retryResp.ok || retryResp.status === 201) return true;
@@ -1022,8 +942,6 @@
               if (emailFeedback) emailFeedback.classList.add('hidden');
               if (nameInput) nameInput.classList.remove('border-accent-lime', 'border-red-400', 'border-red-500');
               if (emailInput) emailInput.classList.remove('border-accent-lime', 'border-red-400', 'border-red-500');
-              if (phoneInput) phoneInput.classList.remove('border-accent-lime', 'border-red-400', 'border-red-500');
-              if (linkedinInput) linkedinInput.classList.remove('border-accent-lime', 'border-red-400', 'border-red-500');
               if (cityInput) cityInput.classList.remove('border-accent-lime', 'border-red-400', 'border-red-500');
             }, 500);
           });
